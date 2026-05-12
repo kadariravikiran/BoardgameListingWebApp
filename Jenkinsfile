@@ -17,7 +17,7 @@ pipeline {
             steps {
 
                 git branch: 'main',
-                url: 'https://github.com/kadariravikiran/FOOD_DEV.git',
+                url: '',https://github.com/kadariravikiran/BoardgameListingWebApp.git
                 credentialsId: 'git-cred'
 
             }
@@ -27,7 +27,7 @@ pipeline {
             steps {
 
                 withMaven(
-                    maven: 'maven2',
+                    maven: 'MAVEN',
                     globalMavenSettingsConfig: 'global-settings'
                 ) {
 
@@ -66,7 +66,7 @@ pipeline {
             steps {
 
                 withMaven(
-                    maven: 'maven2',
+                    maven: 'MAVEN',
                     globalMavenSettingsConfig: 'global-settings'
                 ) {
 
