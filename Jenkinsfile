@@ -1,4 +1,3 @@
-
 pipeline {
 
     agent any
@@ -85,7 +84,7 @@ pipeline {
         stage('Docker Build') {
             steps {
 
-                sh 'docker build -t ravikirankadari/boardgame-app:v1 .'
+                sh 'docker build -t ravikirankadari/myapp:v1 .'
 
             }
         }
@@ -93,7 +92,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
 
-                sh 'trivy image ravikirankadari/boardgame-app:v1'
+                sh 'trivy image ravikirankadari/myapp:v1'
 
             }
         }
@@ -102,10 +101,11 @@ pipeline {
             steps {
 
                 withDockerRegistry(
-                    credentialsId: 'docker-cred'
+                    credentialsId: 'docker-cred',
+                    url: 'https://index.docker.io/v1/'
                 ) {
 
-                    sh 'docker push ravikirankadari/boardgame-app:v1'
+                    sh 'docker push ravikirankadari/myapp:v1'
 
                 }
 
