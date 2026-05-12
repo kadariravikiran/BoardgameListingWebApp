@@ -92,7 +92,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
 
-                sh 'trivy image ravikirankadari/myapp:v1'
+                sh 'sh 'TMPDIR=/opt/trivy-tmp trivy image --scanners vuln ravikirankadari/myapp:v1''
 
             }
         }
