@@ -14,14 +14,18 @@ pipeline {
     stages {
 
         stage('Clone Code') {
-            steps {
+          steps {
 
-                git branch: 'main',
-                url: '',https://github.com/kadariravikiran/BoardgameListingWebApp.git
-                credentialsId: 'git-cred'
+        git(
+            branch: 'main',
+            url: 'https://github.com/kadariravikiran/BoardgameListingWebApp.git',
+            credentialsId: 'git-cred'
+        )
 
-            }
-        }
+    }
+}
+        
+        
 
         stage('Build Maven') {
             steps {
