@@ -7,16 +7,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Spring Boot Parent -->
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.5</version>
+        <version>2.5.6</version>
         <relativePath/>
     </parent>
-
-    <!-- Project Info -->
 
     <groupId>com.javaproject</groupId>
     <artifactId>database_service_project</artifactId>
@@ -24,78 +20,63 @@
 
     <name>database_service_project</name>
 
-    <description>
-        Spring Boot Java 21 Project
-    </description>
+    <description>Project for Spring Boot</description>
 
     <packaging>jar</packaging>
 
-    <!-- Properties -->
-
     <properties>
 
-        <java.version>21</java.version>
+        <java.version>17</java.version>
 
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
 
-        <project.build.sourceEncoding>
-            UTF-8
-        </project.build.sourceEncoding>
+        <maven.compiler.target>17</maven.compiler.target>
 
-        <lombok.version>1.18.34</lombok.version>
+        <jacoco.version>0.8.10</jacoco.version>
 
-        <jacoco.version>0.8.12</jacoco.version>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+
+        <sonar.jacoco.reportPath>
+            ${project.basedir}/target/jacoco.exec
+        </sonar.jacoco.reportPath>
+
+        <sonar.language>java</sonar.language>
 
     </properties>
 
-    <!-- Dependencies -->
-
     <dependencies>
 
-        <!-- Spring Boot Web -->
-
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.thymeleaf.extras</groupId>
+            <artifactId>thymeleaf-extras-springsecurity5</artifactId>
         </dependency>
-
-        <!-- Thymeleaf -->
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
-        <!-- Spring Security -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- JDBC -->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
         </dependency>
 
-        <!-- JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
-        <!-- Thymeleaf Security -->
-
-        <dependency>
-            <groupId>org.thymeleaf.extras</groupId>
-            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-        </dependency>
-
-        <!-- H2 Database -->
 
         <dependency>
             <groupId>com.h2database</groupId>
@@ -103,28 +84,18 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Lombok -->
-
         <dependency>
-
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-
-            <version>${lombok.version}</version>
-
+            <version>1.18.32</version>
             <scope>provided</scope>
-
         </dependency>
-
-        <!-- Testing -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- Security Testing -->
 
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -134,57 +105,56 @@
 
     </dependencies>
 
-    <!-- Build -->
-
     <build>
 
         <plugins>
 
-            <!-- Maven Compiler -->
-
             <plugin>
 
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
 
-                <version>3.13.0</version>
+                <artifactId>spring-boot-maven-plugin</artifactId>
 
                 <configuration>
 
-                    <source>21</source>
-                    <target>21</target>
+                    <excludes>
 
-                    <annotationProcessorPaths>
-
-                        <path>
+                        <exclude>
 
                             <groupId>org.projectlombok</groupId>
+
                             <artifactId>lombok</artifactId>
 
-                            <version>${lombok.version}</version>
+                        </exclude>
 
-                        </path>
-
-                    </annotationProcessorPaths>
+                    </excludes>
 
                 </configuration>
 
             </plugin>
 
-            <!-- Spring Boot -->
-
             <plugin>
 
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+
+                <artifactId>maven-compiler-plugin</artifactId>
+
+                <version>3.11.0</version>
+
+                <configuration>
+
+                    <source>17</source>
+
+                    <target>17</target>
+
+                </configuration>
 
             </plugin>
-
-            <!-- JaCoCo -->
 
             <plugin>
 
                 <groupId>org.jacoco</groupId>
+
                 <artifactId>jacoco-maven-plugin</artifactId>
 
                 <version>${jacoco.version}</version>
@@ -193,22 +163,26 @@
 
                     <execution>
 
-                        <id>prepare-agent</id>
+                        <id>jacoco-initialize</id>
 
                         <goals>
+
                             <goal>prepare-agent</goal>
+
                         </goals>
 
                     </execution>
 
                     <execution>
 
-                        <id>report</id>
+                        <id>jacoco-report</id>
 
-                        <phase>verify</phase>
+                        <phase>package</phase>
 
                         <goals>
+
                             <goal>report</goal>
+
                         </goals>
 
                     </execution>
@@ -220,8 +194,6 @@
         </plugins>
 
     </build>
-
-    <!-- Nexus -->
 
     <distributionManagement>
 
