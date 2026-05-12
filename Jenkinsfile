@@ -1,3 +1,4 @@
+
 pipeline {
 
     agent any
@@ -14,18 +15,16 @@ pipeline {
     stages {
 
         stage('Clone Code') {
-          steps {
+            steps {
 
-        git(
-            branch: 'main',
-            url: 'https://github.com/kadariravikiran/BoardgameListingWebApp.git',
-            credentialsId: 'git-cred'
-        )
+                git(
+                    branch: 'main',
+                    url: 'https://github.com/kadariravikiran/BoardgameListingWebApp.git',
+                    credentialsId: 'git-cred'
+                )
 
-    }
-}
-        
-        
+            }
+        }
 
         stage('Build Maven') {
             steps {
@@ -49,7 +48,9 @@ pipeline {
 
                     sh '''
                     $SCANNER_HOME/bin/sonar-scanner \
-                    -Dsonar.projectName=myapp \
+                    -Dsonar.projectKey=boardgame-app \
+                    -Dsonar.projectName=boardgame-app \
+                    -Dsonar.sources=. \
                     -Dsonar.java.binaries=target
                     '''
 
@@ -84,7 +85,7 @@ pipeline {
         stage('Docker Build') {
             steps {
 
-                sh 'docker build -t ravikirankadari/myapp:v1 .'
+                sh 'docker build -t ravikirankadari/boardgame-app:v1 .'
 
             }
         }
@@ -92,7 +93,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
 
-                sh 'trivy image ravikirankadari/myapp:v1'
+                sh 'trivy image ravikirankadari/boardgame-app:v1'
 
             }
         }
@@ -101,11 +102,10 @@ pipeline {
             steps {
 
                 withDockerRegistry(
-                    credentialsId: 'docker-cred',
-                    toolName: 'docker'
+                    credentialsId: 'docker-cred'
                 ) {
 
-                    sh 'docker push ravikirankadari/myapp:v1'
+                    sh 'docker push ravikirankadari/boardgame-app:v1'
 
                 }
 
