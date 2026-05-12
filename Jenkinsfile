@@ -1,102 +1,122 @@
 pipeline {
+
     agent any
-    
-    tools{
+
+    tools {
         jdk 'jdk17'
-        maven 'maven2'
+        maven 'MAVEN'
     }
-    environment{
-        SCANNER_HOME= tool 'sonar-scanner'
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
     }
-    
 
     stages {
-        
-        stage('Git Checkout ') {
+
+        stage('Clone Code') {
             steps {
-               git branch: 'main', url: 'https://github.com/bhaskar2024958/BoardgameListingWebApp'
+
+                git branch: 'main',
+                url: 'https://github.com/kadariravikiran/FOOD_DEV.git',
+                credentialsId: 'git-cred'
+
             }
         }
-        
-        stage('Compile') {
+
+        stage('Build Maven') {
             steps {
-               sh 'mvn compile'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-               sh 'mvn test'
-            }
-        }
-        
-        stage('File System Scan') {
-            steps {
-                sh 'trivy fs --format table -o trivy-fs-report.html .'
-            }
-        }
-        
-        stage('Sonar Analysis') {
-            steps {
-               withSonarQubeEnv('sonar'){
-                   sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=OnlineGame \
-                   -Dsonar.java.binaries=. \
-                   -Dsonar.projectKey=OnlineGame '''
-               }
-            }
-        }
-        
-     
-        
-        stage('Build') {
-            steps {
-                sh 'mvn package'
-            }
-        }
-        stage('Publish to Nexus') {
-            steps {
-                withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven2', mavenSettingsConfig: '', traceability: true) {
-                     sh 'mvn deploy'
+
+                withMaven(
+                    maven: 'maven2',
+                    globalMavenSettingsConfig: 'global-settings'
+                ) {
+
+                    sh 'mvn clean package'
+
                 }
+
             }
         }
-        stage('Build Docker Image') {
+
+        stage('SonarQube Analysis') {
             steps {
-               script{
-                   withDockerRegistry(credentialsId: 'docker-cred',toolName: 'docker') {
-                    sh "docker build -t javaexpress/boardgame:latest ."
-                 }
-               }
+
+                withSonarQubeEnv('sonarqube') {
+
+                    sh '''
+                    $SCANNER_HOME/bin/sonar-scanner \
+                    -Dsonar.projectName=myapp \
+                    -Dsonar.java.binaries=target
+                    '''
+
+                }
+
             }
         }
-        stage('Docker Image Scan') {
+
+        stage('Trivy File Scan') {
             steps {
-                sh 'trivy image --format table -o trivy-fs-report1.html javaexpress/boardgame:latest'
+
+                sh 'trivy fs .'
+
             }
         }
-        
+
+        stage('Upload To Nexus') {
+            steps {
+
+                withMaven(
+                    maven: 'maven2',
+                    globalMavenSettingsConfig: 'global-settings'
+                ) {
+
+                    sh 'mvn deploy'
+
+                }
+
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+
+                sh 'docker build -t ravikirankadari/myapp:v1 .'
+
+            }
+        }
+
+        stage('Trivy Image Scan') {
+            steps {
+
+                sh 'trivy image ravikirankadari/myapp:v1'
+
+            }
+        }
+
         stage('Docker Push') {
             steps {
-               script{
-                   withDockerRegistry(credentialsId: 'docker-cred',toolName: 'docker') {
-                    sh "docker push javaexpress/boardgame:latest"
-                 }
-               }
-            }
-        }
-        
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'kubectl apply -f deployment-service.yaml'
-            }
-        }
-        
-        stage('Verify Deployment') {
-            steps {
-               sh 'kubectl get pods'
-               sh 'kubectl get svc'
-            }
-        }
-    }
-}
 
+                withDockerRegistry(
+                    credentialsId: 'docker-cred',
+                    toolName: 'docker'
+                ) {
+
+                    sh 'docker push ravikirankadari/myapp:v1'
+
+                }
+
+            }
+        }
+
+        stage('Deploy To Kubernetes') {
+            steps {
+
+                sh 'kubectl apply -f deployment.yaml'
+                sh 'kubectl apply -f service.yaml'
+
+            }
+        }
+
+    }
+
+}
