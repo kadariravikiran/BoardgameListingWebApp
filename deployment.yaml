@@ -19,7 +19,6 @@ spec:
     spec:
       containers:
       - name: springboot-container
-        image: DOCKER_USERNAME/myapp:v1
-
+        image: ravikirankadari/myapp:v1
         ports:
         - containerPort: 8080
