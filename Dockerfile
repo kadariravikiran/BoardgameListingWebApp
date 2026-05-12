@@ -1,11 +1,5 @@
-FROM adoptopenjdk/openjdk11
-  
-EXPOSE 8080
- 
-ENV APP_HOME /usr/src/app
+FROM openjdk:17
 
-COPY target/database_service_project-2.0.0.jar $APP_HOME/app.jar
+COPY target/*.jar app.jar
 
-WORKDIR $APP_HOME
-
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar"]
