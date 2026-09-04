@@ -1,0 +1,65 @@
+name: Build and Push to GAR
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Checkout source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Set up Java 17
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Build Java application
+      - name: Build with Maven
+        run: ./mvnw clean package
+
+      # 4. Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t boardgame-app:latest .
+
+      # 5. Authenticate to Google Cloud using WIF
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/1087063050511/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions-sa@githubactions-to-gke.iam.gserviceaccount.com'
+
+      # 6. Set up Google Cloud CLI
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      # 7. Configure Docker to use Artifact Registry
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+
+      # 8. Tag Docker image
+      - name: Tag Docker image
+        run: |
+          docker tag boardgame-app:latest \
+            asia-south1-docker.pkg.dev/githubactions-to-gke/boardgame-repo/boardgame-app:latest
+
+      # 9. Push Docker image to Artifact Registry
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push \
+            asia-south1-docker.pkg.dev/githubactions-to-gke/boardgame-repo/boardgame-app:latest
