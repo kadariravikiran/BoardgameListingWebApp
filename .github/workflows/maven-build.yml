@@ -4,6 +4,15 @@ on:
   push:
     branches:
       - main
+      - develop
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read   
 
 jobs:
   build:
@@ -11,6 +20,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -20,5 +31,33 @@ jobs:
           cache: maven
         
       - name: Build with Maven
-        run: ./mvnw clean package  
+        run: ./mvnw clean package
+
+      - name: SonarQube Cloud Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.organization=kadariravikiran -Dsonar.projectKey=kadariravikiran_BoardgameListingWebApp
+
+      - name: Build Docker image
+        run: docker build -t boardgame-app:latest .
+
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/887456464145/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions-sa@project-b1401e3c-6c22-44e2-ba6.iam.gserviceaccount.com'
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+
+      - name: Tag Docker image
+        run: |
+          docker tag boardgame-app:latest \
+            asia-south1-docker.pkg.dev/project-b1401e3c-6c22-44e2-ba6/boardgame-repo/boardgame-app:latest
+
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push \
+            asia-south1-docker.pkg.dev/project-b1401e3c-6c22-44e2-ba6/boardgame-repo/boardgame-app:latest    
 
