@@ -56,3 +56,8 @@ jobs:
           docker tag boardgame-app:latest \
             asia-south1-docker.pkg.dev/project-b1401e3c-6c22-44e2-ba6/boardgame-repo/boardgame-app:latest
 
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push \
+            asia-south1-docker.pkg.dev/project-b1401e3c-6c22-44e2-ba6/boardgame-repo/boardgame-app:latest    
+
