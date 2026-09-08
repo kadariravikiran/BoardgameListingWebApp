@@ -65,5 +65,10 @@ jobs:
         with:
           cluster_name: board-game-cluster
           location: asia-south1
-          project_id: project-b1401e3c-6c22-44e2-ba6   
+          project_id: project-b1401e3c-6c22-44e2-ba6
+
+      - name: Deploy application to GKE
+        run: |
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml 
 
