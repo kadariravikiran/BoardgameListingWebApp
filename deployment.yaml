@@ -2,23 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: springboot-deployment
+  name: boardgame-app
 
 spec:
   replicas: 2
 
   selector:
     matchLabels:
-      app: springboot
+      app: boardgame-app
 
   template:
     metadata:
       labels:
-        app: springboot
+        app: boardgame-app
 
     spec:
       containers:
-      - name: springboot-container
-        image: ravikirankadari/myapp:v1
-        ports:
-        - containerPort: 8080
+        - name: boardgame-app
+          image: asia-south1-docker.pkg.dev/project-b1401e3c-6c22-44e2-ba6/boardgame-repo/boardgame-app:latest
+
+          ports:
+            - containerPort: 8080
