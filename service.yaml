@@ -2,14 +2,14 @@ apiVersion: v1
 kind: Service
 
 metadata:
-  name: springboot-svc
+  name: boardgame-service
 
 spec:
   type: LoadBalancer
 
   selector:
-    app: springboot
+    app: boardgame-app
 
   ports:
-  - port: 80
-    targetPort: 8080
+    - port: 80
+      targetPort: 8080

@@ -59,5 +59,11 @@ jobs:
       - name: Push Docker image to Artifact Registry
         run: |
           docker push \
-            asia-south1-docker.pkg.dev/project-b1401e3c-6c22-44e2-ba6/boardgame-repo/boardgame-app:latest    
+            asia-south1-docker.pkg.dev/project-b1401e3c-6c22-44e2-ba6/boardgame-repo/boardgame-app:latest
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: board-game-cluster
+          location: asia-south1
+          project_id: project-b1401e3c-6c22-44e2-ba6   
 
